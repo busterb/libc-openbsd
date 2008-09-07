@@ -1,8 +1,6 @@
-/*	$OpenBSD$ */
-
+/*	$OpenBSD$	*/
 /*
- * Copyright (c) 2008 Landry Breuil
- * All rights reserved.
+ * Copyright (c) 2008 Martynas Venckus <martynas@openbsd.org>
  *
  * Permission to use, copy, modify, and distribute this software for any
  * purpose with or without fee is hereby granted, provided that the above
@@ -17,23 +15,15 @@
  * OR IN CONNECTION WITH THE USE OR PERFORMANCE OF THIS SOFTWARE.
  */
 
-#include <errno.h>
-#include <limits.h>
-#include <stdlib.h>
-#include <math.h>
+#include <sys/types.h>
+#include <machine/ieee.h>
 
-float
-strtof(const char *s00, char **se)
+int
+__isinfl(long double e)
 {
-	double	d;
+	struct ieee_ext *p = (struct ieee_ext *)&e;
 
-	d = strtod(s00, se);
-	if (d > FLT_MAX) {
-		errno = ERANGE;
-		return (FLT_MAX);
-	} else if (d < -FLT_MAX) {
-		errno = ERANGE;
-		return (-FLT_MAX);
-	}
-	return ((float) d);
+	return (p->ext_exp == EXT_EXP_INFNAN &&
+	    p->ext_frach == 0 && p->ext_frachm == 0 &&
+	    p->ext_fraclm == 0 && p->ext_fracl == 0);
 }
