@@ -114,13 +114,15 @@ static inline void
 _rs_stir_if_needed(size_t len)
 {
 #ifndef MAP_INHERIT_ZERO
-	static pid_t _rs_pid = 0;
-	pid_t pid = getpid();
+	if (rs) {
+		static pid_t _rs_pid = 0;
+		pid_t pid = getpid();
 
-	/* If a system lacks MAP_INHERIT_ZERO, resort to getpid() */
-	if (_rs_pid == 0 || _rs_pid != pid) {
-		_rs_pid = pid;
-		rs->rs_count = 0;
+		/* If a system lacks MAP_INHERIT_ZERO, resort to getpid() */
+		if (_rs_pid == 0 || _rs_pid != pid) {
+			_rs_pid = pid;
+			rs->rs_count = 0;
+		}
 	}
 #endif
 	if (!rs || rs->rs_count <= len)
